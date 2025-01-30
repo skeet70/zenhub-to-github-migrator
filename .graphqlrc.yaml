@@ -1,0 +1,7 @@
+projects:
+  github:
+    schema: "schemas/github.graphql"
+    documents: "queries/github/*.graphql"
+  zenhub:
+    schema: "schemas/zenhub.graphql"
+    documents: "queries/zenhub/*.graphql"
