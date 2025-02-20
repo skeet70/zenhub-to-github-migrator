@@ -1,0 +1,14 @@
+query GetWorkspace {
+  recentlyViewedWorkspaces {
+    nodes {
+      name
+      id
+      pipelinesConnection {
+        nodes {
+          id
+          name
+        }
+      }
+    }
+  }
+}

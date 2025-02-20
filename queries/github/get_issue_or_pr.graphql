@@ -1,27 +1,27 @@
 query GetIssueOrPr($repo:String!, $owner:String!, $number:Int!) {
   repository(name:$repo, owner:$owner) {
-      issueOrPullRequest(number: $number) {
-        __typename
-        ... on Issue {
-          title
-          url
-          id
-          number
-          body
-          repository { id name archivedAt owner{ __typename login }}
-          projectsV2(first:100) { nodes { id }
-          }
-        }
-        ... on PullRequest {
-          title
-          url
-          id
-          number
-          body        
-          repository { id name archivedAt owner{ __typename login }}
-          projectsV2(first:100) { nodes { id }
-          }
+    issueOrPullRequest(number: $number) {
+      __typename
+      ... on Issue {
+        title
+        url
+        id
+        number
+        body
+        repository { id name archivedAt owner{ __typename login }}
+        projectsV2(first:100) { nodes { id }
         }
       }
+      ... on PullRequest {
+        title
+        url
+        id
+        number
+        body        
+        repository { id name archivedAt owner{ __typename login }}
+        projectsV2(first:100) { nodes { id }
+        }
+      }
+    }
   }
 }
