@@ -39,7 +39,7 @@ pub fn get_workspace(
 #[graphql(
     schema_path = "schemas/zenhub.graphql",
     query_path = "queries/zenhub/get_pipeline_issues.graphql",
-    response_derives = "Debug"
+    response_derives = "Debug, Clone"
 )]
 pub struct GetPipelineIssues;
 
@@ -49,18 +49,32 @@ pub fn get_pipeline_issues(
     workspace_id: &str,
 ) -> Result<Vec<get_pipeline_issues::GetPipelineIssuesSearchIssuesByPipelineNodes>, anyhow::Error> {
     use get_pipeline_issues::*;
-    let variables = Variables {
-        pipeline_id: pipeline_id.to_string(),
-        workspace_id: workspace_id.to_string(),
-    };
-    let response_body = post_graphql::<GetPipelineIssues, _>(&client, URL, variables)?;
-    let response_data: ResponseData = response_body
-        .data
-        .expect("Failed to get Zenhub pipeline issue data.");
-    let issues = response_data
-        .search_issues_by_pipeline
-        .expect("No issue data recieved for pipeline.")
-        .nodes;
 
-    Ok(issues)
+    let mut pipeline_issues = vec![];
+    let mut has_next_page = true;
+    let mut end_cursor = None;
+    while has_next_page {
+        let variables = Variables {
+            pipeline_id: pipeline_id.to_string(),
+            workspace_id: workspace_id.to_string(),
+            end_cursor: end_cursor.clone(),
+        };
+        let response_body = post_graphql::<GetPipelineIssues, _>(&client, URL, variables)?;
+        if response_body.errors.is_some() {
+            println!(
+                "Error while getting ZH Pipeline issues {:?}",
+                response_body.errors.as_ref().unwrap()
+            );
+        }
+        let response_data = response_body
+            .data
+            .expect("Failed to get Zenhub pipeline issue data.")
+            .search_issues_by_pipeline
+            .expect("No issue data recieved for pipeline.");
+        has_next_page = response_data.page_info.has_next_page;
+        end_cursor = response_data.page_info.end_cursor;
+        pipeline_issues.append(&mut response_data.nodes.clone());
+    }
+
+    Ok(pipeline_issues)
 }

@@ -1,5 +1,5 @@
-query GetPipelineIssues($pipelineId: ID!, $workspaceId: ID!) {
-  searchIssuesByPipeline(pipelineId: $pipelineId, filters: {displayType: all}) {
+query GetPipelineIssues($pipelineId: ID!, $workspaceId: ID!, $endCursor: String) {
+  searchIssuesByPipeline(first: 100, after: $endCursor, pipelineId: $pipelineId, filters: {displayType: all}) {
     nodes {
       title
       # ghId is available and what we really want here, but it isn't set in Zenhub on many objects
@@ -23,6 +23,10 @@ query GetPipelineIssues($pipelineId: ID!, $workspaceId: ID!) {
       estimate {
         value
       }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
     }
   }
 }
