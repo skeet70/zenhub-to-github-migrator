@@ -34,3 +34,33 @@ pub fn get_workspace(
 
     Ok(desired_workspace.clone())
 }
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "schemas/zenhub.graphql",
+    query_path = "queries/zenhub/get_pipeline_issues.graphql",
+    response_derives = "Debug"
+)]
+pub struct GetPipelineIssues;
+
+pub fn get_pipeline_issues(
+    client: Client,
+    pipeline_id: &str,
+    workspace_id: &str,
+) -> Result<Vec<get_pipeline_issues::GetPipelineIssuesSearchIssuesByPipelineNodes>, anyhow::Error> {
+    use get_pipeline_issues::*;
+    let variables = Variables {
+        pipeline_id: pipeline_id.to_string(),
+        workspace_id: workspace_id.to_string(),
+    };
+    let response_body = post_graphql::<GetPipelineIssues, _>(&client, URL, variables)?;
+    let response_data: ResponseData = response_body
+        .data
+        .expect("Failed to get Zenhub pipeline issue data.");
+    let issues = response_data
+        .search_issues_by_pipeline
+        .expect("No issue data recieved for pipeline.")
+        .nodes;
+
+    Ok(issues)
+}

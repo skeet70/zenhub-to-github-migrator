@@ -1,7 +1,0 @@
-query GetWorkspaceIssues($pipelineId: ID!, $workspaceId: ID!) {
-  searchIssuesByPipeline(pipelineId: $pipelineId, filters: { displayType: all }) {
-    nodes {
-      ghId
-    }
-  }
-}

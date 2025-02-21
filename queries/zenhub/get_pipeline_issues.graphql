@@ -1,0 +1,28 @@
+query GetPipelineIssues($pipelineId: ID!, $workspaceId: ID!) {
+  searchIssuesByPipeline(pipelineId: $pipelineId, filters: {displayType: all}) {
+    nodes {
+      title
+      # ghId is available and what we really want here, but it isn't set in Zenhub on many objects
+      number
+      pullRequest
+      pipelineIssue(workspaceId: $workspaceId) {
+        priority {
+          id
+          name
+          color
+        }
+      }
+      repository {
+        ghId
+        name
+        owner {
+          __typename
+          login
+        }
+      }
+      estimate {
+        value
+      }
+    }
+  }
+}
